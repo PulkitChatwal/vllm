@@ -86,6 +86,27 @@ class MockTensor:
             return MockTensor([a-b for a, b in zip(self.data, other.data)])
         return self
 
+    def __add__(self, other):
+        if isinstance(other, MockTensor):
+            # Element-wise addition
+            if len(self.shape) == 1 and len(other.shape) == 1:
+                return MockTensor([a+b for a, b in zip(self.data, other.data)])
+            else:
+                return MockTensor([[a+b for a, b in zip(row, other_row)] for row, other_row in zip(self.data, other.data)])
+        elif isinstance(other, (int, float)):
+            # Scalar addition
+            if isinstance(self.data, list):
+                if len(self.data) > 0 and isinstance(self.data[0], list):
+                    return MockTensor([[x+other for x in row] for row in self.data])
+                else:
+                    return MockTensor([x+other for x in self.data])
+            else:
+                return MockTensor(self.data + other)
+        return self
+
+    def __radd__(self, other):
+        return self.__add__(other)
+
     def __lt__(self, other):
         if isinstance(other, (int, float)):
             return MockTensor([x < other for x in self.data])

@@ -64,6 +64,33 @@ class CacheConfig:
     default based on the resolved KV cache groups (typically the smallest KV
     cache block size when there are multiple groups).
     """
+
+    # PagedEviction configuration (EACL 2026)
+    enable_paged_eviction: bool = False
+    """Whether to enable PagedEviction KV cache pruning.
+
+    PagedEviction is a block-aligned KV cache eviction strategy that reduces
+    memory usage while maintaining accuracy. See:
+    https://github.com/PulkitChatwal/vllm
+    """
+    paged_eviction_budget: int = 1024
+    """Maximum number of tokens to keep in the KV cache per sequence.
+
+    When the cache exceeds this budget, PagedEviction will evict entire blocks
+    of tokens based on importance scores. Must be a multiple of block_size.
+    Default: 1024 tokens.
+    """
+    paged_eviction_protect_recent_blocks: int = 1
+    """Number of most recent blocks to protect from eviction.
+
+    These blocks contain the most recently generated tokens which are critical
+    for coherence. Default: 1 block.
+    """
+    paged_eviction_log: bool = False
+    """Enable detailed logging for PagedEviction operations.
+
+    Useful for debugging and performance analysis. Default: False.
+    """
     gpu_memory_utilization: float = Field(default=0.92, gt=0, le=1)
     """The fraction of GPU memory to be used for the model executor, which can
     range from 0 to 1. For example, a value of 0.5 would imply 50% GPU memory

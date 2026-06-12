@@ -434,6 +434,13 @@ class EngineArgs:
     config_format: str = ModelConfig.config_format
     dtype: ModelDType = ModelConfig.dtype
     kv_cache_dtype: CacheDType = CacheConfig.cache_dtype
+    # PagedEviction configuration (EACL 2026)
+    enable_paged_eviction: bool = CacheConfig.enable_paged_eviction
+    paged_eviction_budget: int = CacheConfig.paged_eviction_budget
+    paged_eviction_protect_recent_blocks: int = (
+        CacheConfig.paged_eviction_protect_recent_blocks
+    )
+    paged_eviction_log: bool = CacheConfig.paged_eviction_log
     seed: int = ModelConfig.seed
     max_model_len: int = ModelConfig.max_model_len
     cudagraph_capture_sizes: list[int] | None = (
@@ -1168,6 +1175,24 @@ class EngineArgs:
             "--kv-offloading-backend", **cache_kwargs["kv_offloading_backend"]
         )
 
+        # PagedEviction configuration (EACL 2026)
+        cache_group.add_argument(
+            "--enable-paged-eviction",
+            **cache_kwargs["enable_paged_eviction"],
+        )
+        cache_group.add_argument(
+            "--paged-eviction-budget",
+            **cache_kwargs["paged_eviction_budget"],
+        )
+        cache_group.add_argument(
+            "--paged-eviction-protect-recent-blocks",
+            **cache_kwargs["paged_eviction_protect_recent_blocks"],
+        )
+        cache_group.add_argument(
+            "--paged-eviction-log",
+            **cache_kwargs["paged_eviction_log"],
+        )
+
         # Model weight offload related configs
         offload_kwargs = get_kwargs(OffloadConfig)
         uva_kwargs = get_kwargs(UVAOffloadConfig)
@@ -1775,6 +1800,13 @@ class EngineArgs:
             mamba_cache_mode=self.mamba_cache_mode,
             kv_offloading_size=self.kv_offloading_size,
             kv_offloading_backend=self.kv_offloading_backend,
+            # PagedEviction configuration (EACL 2026)
+            enable_paged_eviction=self.enable_paged_eviction,
+            paged_eviction_budget=self.paged_eviction_budget,
+            paged_eviction_protect_recent_blocks=(
+                self.paged_eviction_protect_recent_blocks
+            ),
+            paged_eviction_log=self.paged_eviction_log,
         )
 
         if resolved_cache_dtype.startswith("turboquant_"):

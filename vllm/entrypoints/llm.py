@@ -217,6 +217,11 @@ class LLM(BeamSearchOfflineMixin, PoolingOfflineMixin, OfflineInferenceMixin):
         spec_method: str | None = None,
         spec_model: str | None = None,
         spec_tokens: int | None = None,
+        # PagedEviction parameters (EACL 2026)
+        enable_paged_eviction: bool = False,
+        paged_eviction_budget: int = 1024,
+        paged_eviction_protect_recent_blocks: int = 1,
+        paged_eviction_log: bool = False,
         **kwargs: Any,
     ) -> None:
         """LLM constructor."""
